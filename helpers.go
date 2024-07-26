@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func commandHelp() error{
+func commandHelp(input string) error{
 	fmt.Println("\nWelcome to the Pokedex!")
 	fmt.Println("Usages:\n")
 	for _, v := range newCommandsMap(){
@@ -14,6 +14,6 @@ func commandHelp() error{
 	return nil
 }
 
-func commandExit() error{
+func commandExit(input string) error{
 	return nil
 }
