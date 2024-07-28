@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	cache "pokedex.ayonchakroborty.net/internals/pokecache"
 )
@@ -44,6 +45,10 @@ func (p *Pokemons) Explore(area string) error {
 	body, err := p.getData(area)
 	if err != nil{
 		return err
+	}
+	if strings.Compare(string(body), "Not Found") == 0{
+		fmt.Printf("\nError: %s is not a real area\n\n", area)
+		return nil
 	}
 
 	err = json.Unmarshal(body, p)

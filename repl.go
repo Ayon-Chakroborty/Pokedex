@@ -20,6 +20,7 @@ type cliCommand struct {
 type application struct {
 	pokeMap  *pokeapi.PokedexMap
 	pokemons *pokeapi.Pokemons
+	pokedex  *pokeapi.Pokedex
 }
 
 func startRepl() {
@@ -34,6 +35,9 @@ func startRepl() {
 		},
 		pokemons: &pokeapi.Pokemons{
 			GameCache: gameCache,
+		},
+		pokedex: &pokeapi.Pokedex{
+			PokedexEntries: make(map[string]pokeapi.Entry),
 		},
 	}
 
@@ -73,6 +77,32 @@ func startRepl() {
 				panic(err)
 			}
 			continue
+		} else if strings.Compare(input[0], "catch") == 0 {
+			if len(input) < 2 {
+				errorMessage = "Error: too few arguments with 'catch'"
+				printErrorMessage(errorMessage,
+					"'catch' takes 1 arugment that represents pokemon.\n Example: 'catch clefairy'")
+				continue
+			}
+
+			err := command.callBack(input[1])
+			if err != nil {
+				panic(err)
+			}
+			continue
+		} else if strings.Compare(input[0], "inspect") == 0 {
+			if len(input) < 2 {
+				errorMessage = "Error: too few arguments with 'inspect'"
+				printErrorMessage(errorMessage,
+					"'inspect' takes 1 arugment that represents pokemon.\n Example: 'inspect clefairy'")
+				continue
+			}
+
+			err := command.callBack(input[1])
+			if err != nil {
+				panic(err)
+			}
+			continue
 		}
 
 		err := command.callBack("")
@@ -82,38 +112,6 @@ func startRepl() {
 
 		fmt.Println()
 	}
-}
-
-func addCommands(c map[string]cliCommand, app *application) {
-	if entry, ok := c["map"]; ok {
-		entry.callBack = app.pokeMap.CommandMapf
-		c["map"] = entry
-	}
-
-	if entry, ok := c["mapb"]; ok {
-		entry.callBack = app.pokeMap.CommandMapb
-		c["mapb"] = entry
-	}
-
-	if entry, ok := c["explore"]; ok {
-		entry.callBack = app.pokemons.Explore
-		c["explore"] = entry
-	}
-
-}
-
-func printErrorMessage(err string, helper string) {
-	fmt.Printf("\n%s\n", err)
-	fmt.Printf("\n%s\n\n", helper)
-}
-
-func cleanInput(input string) []string {
-	input = strings.ToLower(input)
-	return strings.Fields(input)
-}
-
-func exitRepl(input []string) bool {
-	return len(input) == 1 && strings.Compare(input[0], "exit") == 0
 }
 
 func newCommandsMap() map[string]cliCommand {
@@ -139,6 +137,16 @@ func newCommandsMap() map[string]cliCommand {
 		"explore": {
 			name:        "explore",
 			description: "Explores a location and lists out the pokemon in that area",
+		},
+
+		"catch": {
+			name:        "catch",
+			description: "Tries to catch a specific pokemon",
+		},
+
+		"inspect": {
+			name:        "inspect",
+			description: "Shows details of a specific pokemon",
 		},
 	}
 }
